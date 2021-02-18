@@ -2,6 +2,7 @@ package pe.edu.galaxy.java.api.spring.boot.talleres.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +16,6 @@ import lombok.Data;
 import pe.edu.galaxy.java.api.spring.boot.talleres.model.Taller;
 import pe.edu.galaxy.java.api.spring.boot.talleres.service.TallerService;
 
-@Data
 @RestController
 @RequestMapping("/talleres/v1")
 public class TallerController {	
@@ -25,13 +25,19 @@ public class TallerController {
 	
 	@GetMapping("/{id}")
 	public Taller getTaller(@PathVariable Long id) {
-		return this.getTallerService().getTaller(id);	
+		if (id<=0) {
+			
+		}
+		return this.tallerService.getTaller(id);
 	}
 	
 	@GetMapping
-	//@RequestMapping("/listado")
-	public List<Taller> getTalleres() {		
-		return this.getTallerService().getTalleres();		
+	public ResponseEntity<List<Taller>> getTalleres() {
+		List<Taller> lst=this.tallerService.getTalleres();
+		if(lst.isEmpty()) {
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.ok(lst);	
 	}
 	
 	@GetMapping
@@ -43,7 +49,7 @@ public class TallerController {
 	
 	@PostMapping
 	public Taller insertar(@RequestBody Taller taller) {
-		return this.getTallerService().grabar(taller);		
+		return this.tallerService.grabar(taller);		
 	}
 	
 	@PutMapping("/{id}")
