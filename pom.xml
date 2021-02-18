@@ -10,9 +10,9 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>pe.edu.galaxy.java.api</groupId>
-	<artifactId>spring.boot.talleres.v1</artifactId>
+	<artifactId>spring.boot.talleres.v2</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>spring.boot.talleres.v1</name>
+	<name>spring.boot.talleres.v2</name>
 	<description>API gestion de talleres</description>
 	<properties>
 		<java.version>11</java.version>

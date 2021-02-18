@@ -13,5 +13,7 @@ public interface TallerService {
 	Taller grabar(Taller taller);
 	
 	Taller eliminar(Long id);
+
+	List<Taller> buscar(Taller taller);
 	
 }

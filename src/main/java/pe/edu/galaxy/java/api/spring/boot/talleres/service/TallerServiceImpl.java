@@ -66,4 +66,12 @@ public class TallerServiceImpl implements TallerService {
 		return tallerRepository.save(oTaller);
 	}
 
+	@Override
+	public List<Taller> buscar(Taller taller) {
+		String nombre=taller.getNombre();
+		nombre=nombre==null?"":nombre;
+		return tallerRepository.buscar("%"+nombre+"%");
+		
+	}
+
 }
