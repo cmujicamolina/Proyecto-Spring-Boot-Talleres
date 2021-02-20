@@ -23,7 +23,7 @@ import pe.edu.galaxy.java.api.spring.boot.talleres.service.TallerService;
 @Slf4j
 @RestController
 @RequestMapping("/talleres/v1")
-public class TallerController {	
+public class TallerController extends GenericController{	
 	
 	@Autowired
 	private TallerService tallerService;
@@ -76,9 +76,7 @@ public class TallerController {
 	@PostMapping
 	public ResponseEntity<Taller> insertar(@Validated  @RequestBody Taller taller, BindingResult result) {
 		if (result.hasErrors()) {
-			String msgErr= result.getAllErrors().toString();
-			log.error("msgErr" +msgErr);
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,msgErr);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,super.formatMapMessage(result));
 		}
 		
 		Taller oTaller=tallerService.grabar(taller);
@@ -89,14 +87,33 @@ public class TallerController {
 	}
 	
 	@PutMapping("/{id}")
-	public Taller actualizar(@PathVariable Long id,@RequestBody Taller taller) {
+	public ResponseEntity<Taller> actualizar(@PathVariable Long id,@Validated @RequestBody Taller taller,  BindingResult result) {
+		if (id<=0) {
+			return ResponseEntity.badRequest().build();
+		}
 		taller.setId(id);
-		return tallerService.grabar(taller);
+		
+		if (result.hasErrors()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,super.formatMapMessage(result));
+		}
+		
+		Taller oTaller=tallerService.grabar(taller);
+		if (oTaller!=null) {
+			return ResponseEntity.status(HttpStatus.OK).body(oTaller);
+		}
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();	
 	}
 	
 	@DeleteMapping("/{id}")
-	public Taller eliminar(@PathVariable Long id) {
-		return tallerService.eliminar(id);
+	public ResponseEntity<Taller> eliminar(@PathVariable Long id) {
+		if (id<=0) {
+			return ResponseEntity.badRequest().build();
+		}
+		Taller oTaller=tallerService.eliminar(id);
+		if (oTaller!=null) {
+			return ResponseEntity.status(HttpStatus.OK).body(oTaller);
+		}
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();			
 	}
 	
 }
