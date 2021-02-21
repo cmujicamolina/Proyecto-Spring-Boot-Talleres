@@ -1,4 +1,4 @@
-package pe.edu.galaxy.java.api.spring.boot.talleres.controller;
+package pe.edu.galaxy.java.api.spring.boot.talleres.controller.programacion;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import lombok.extern.slf4j.Slf4j;
+import pe.edu.galaxy.java.api.spring.boot.talleres.controller.commons.ResponseREST;
+import pe.edu.galaxy.java.api.spring.boot.talleres.controller.constants.ResponseConstants;
+import pe.edu.galaxy.java.api.spring.boot.talleres.controller.generic.GenericController;
 import pe.edu.galaxy.java.api.spring.boot.talleres.model.Taller;
 import pe.edu.galaxy.java.api.spring.boot.talleres.service.TallerService;
 
-@Slf4j
+//@Slf4j
 @RestController
 @RequestMapping("/talleres/v1")
 public class TallerController extends GenericController{	
@@ -40,7 +43,7 @@ public class TallerController extends GenericController{
 		}
 		return ResponseEntity.ok(taller);
 	}
-	
+	/*
 	@GetMapping("/{anio}/nroExp")
 	public ResponseEntity<Taller> getExpediente(@PathVariable Short anio,@PathVariable String nroExp) {
 		return null;
@@ -51,15 +54,26 @@ public class TallerController extends GenericController{
 			@RequestParam String nroExp,
 			@RequestParam String resumen) {
 		return null;
-	}
+	}*/
 	
 	@GetMapping
-	public ResponseEntity<List<Taller>> getTalleres() {
+	public ResponseEntity<ResponseREST> getTalleres() {
 		List<Taller> lst=this.tallerService.getTalleres();
 		if(lst.isEmpty()) {
-			return ResponseEntity.noContent().build();
+			ResponseREST res= ResponseREST.builder()
+								.mensaje(ResponseConstants.MSG_CONS_SIN_CONT)
+								.estado(HttpStatus.NO_CONTENT)
+								.error(HttpStatus.NO_CONTENT.toString())
+								.build();
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(res);
 		}
-		return ResponseEntity.ok(lst);		
+		ResponseREST res= ResponseREST.builder()
+				.mensaje(ResponseConstants.MSG_CONS_EXITO)
+				.estado(HttpStatus.OK)
+				.error(HttpStatus.OK.toString())
+				.registro(lst)
+				.build();
+		return ResponseEntity.ok(res);		
 	}
 	
 	@GetMapping
@@ -74,44 +88,44 @@ public class TallerController extends GenericController{
 	}
 	
 	@PostMapping
-	public ResponseEntity<Taller> insertar(@Validated  @RequestBody Taller taller, BindingResult result) {
+	public ResponseEntity<ResponseREST> insertar(@Validated  @RequestBody Taller taller, BindingResult result) {
 		if (result.hasErrors()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,super.formatMapMessage(result));
+			return super.getBadRequest(result);
 		}
 		
 		Taller oTaller=tallerService.grabar(taller);
-		if (oTaller!=null) {
-			return ResponseEntity.status(HttpStatus.CREATED).body(oTaller);
-		}
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();	
+		if (oTaller!=null) {			
+			return super.getCreatedRequest(oTaller);
+		}		
+		return super.getErrorRequest();
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Taller> actualizar(@PathVariable Long id,@Validated @RequestBody Taller taller,  BindingResult result) {
+	public ResponseEntity<ResponseREST> actualizar(@PathVariable Long id,@Validated @RequestBody Taller taller,  BindingResult result) {
 		if (id<=0) {
 			return ResponseEntity.badRequest().build();
 		}
 		taller.setId(id);
 		
 		if (result.hasErrors()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,super.formatMapMessage(result));
+			return super.getBadRequest(result);
 		}
 		
 		Taller oTaller=tallerService.grabar(taller);
 		if (oTaller!=null) {
-			return ResponseEntity.status(HttpStatus.OK).body(oTaller);
+			return super.getOKRequest(oTaller);
 		}
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();	
+		return super.getErrorRequest();
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Taller> eliminar(@PathVariable Long id) {
+	public ResponseEntity<ResponseREST> eliminar(@PathVariable Long id) {
 		if (id<=0) {
 			return ResponseEntity.badRequest().build();
 		}
 		Taller oTaller=tallerService.eliminar(id);
 		if (oTaller!=null) {
-			return ResponseEntity.status(HttpStatus.OK).body(oTaller);
+			return super.getOKRequest(oTaller);
 		}
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();			
 	}
